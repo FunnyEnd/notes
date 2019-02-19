@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation\Timestampable;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -34,6 +35,18 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(name="is_active", type="boolean")
      */
     private $isActive;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetime", nullable = true)
+     */
+    private $updatedAt;
 
     public function __construct()
     {
@@ -135,7 +148,7 @@ class User implements UserInterface, \Serializable
      */
     public function getRoles()
     {
-        // TODO: Implement getRoles() method.
+        return ['REGISTERED_USER'];
     }
 
     /**
@@ -156,6 +169,26 @@ class User implements UserInterface, \Serializable
      */
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
+        unset($this->plainPassword);
+    }
+
+    /**
+     * Gets triggered only on insert
+     * @ORM\PrePersist
+     * @throws \Exception
+     */
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
+
+    /**
+     * Gets triggered every time on update
+     * @ORM\PreUpdate
+     * @throws \Exception
+     */
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
     }
 }
